@@ -115,6 +115,7 @@ Flipsnap.prototype.init = function(element, opts) {
   self.transitionDuration = (opts.transitionDuration === undefined) ? '350ms' : opts.transitionDuration + 'ms';
   self.threshold = opts.threshold || 0;
   self.snapright = opts.snapright ? true : false;
+  self.centered = opts.centered ? true : false;
 
   // set property
   self.currentPoint = 0;
@@ -283,6 +284,9 @@ Flipsnap.prototype.moveToPoint = function(point, transitionDuration) {
   var targetPoint = - self.currentPoint * self._distance;
   if(targetPoint < self._maxX && self.snapright) {
     targetPoint = self._maxX;
+  }
+  if(document.documentElement.clientWidth > (self._distance * self.element.children.length) && self.centered) {
+    targetPoint = (document.documentElement.clientWidth - (self._distance * self.element.children.length)) / 2;
   }
   self._setX(targetPoint, transitionDuration);
 
