@@ -114,6 +114,7 @@ Flipsnap.prototype.init = function(element, opts) {
   self.disable3d = (opts.disable3d === undefined) ? false : opts.disable3d;
   self.transitionDuration = (opts.transitionDuration === undefined) ? '350ms' : opts.transitionDuration + 'ms';
   self.threshold = opts.threshold || 0;
+  self.snapright = opts.snapright ? true : false;
 
   // set property
   self.currentPoint = 0;
@@ -206,7 +207,14 @@ Flipsnap.prototype.refresh = function() {
   }
 
   // setting maxX
-  self._maxX = -self._distance * self._maxPoint;
+  if(self.snapright) {
+    var childLength = self.element.children.length;
+    var clientWidth = document.documentElement.clientWidth;
+    self._maxPoint = childLength - Math.ceil(clientWidth / self._distance) + 1;
+    self._maxX = - ((self._distance * childLength) - clientWidth);
+  } else {
+    self._maxX = -self._distance * self._maxPoint;
+  }
 
   self.moveToPoint();
 };
@@ -272,7 +280,11 @@ Flipsnap.prototype.moveToPoint = function(point, transitionDuration) {
   else {
     self.animation = true;
   }
-  self._setX(- self.currentPoint * self._distance, transitionDuration);
+  var targetPoint = - self.currentPoint * self._distance;
+  if(targetPoint < self._maxX && self.snapright) {
+    targetPoint = self._maxX;
+  }
+  self._setX(targetPoint, transitionDuration);
 
   if (beforePoint !== self.currentPoint) { // is move?
     // `fsmoveend` is deprecated
